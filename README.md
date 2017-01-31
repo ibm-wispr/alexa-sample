@@ -6,7 +6,7 @@ This project is based on the Skills Trivia sample from Amazon - https://develope
 ###To run this sample, you will need:
   1.  An Alexa Developer account - https://developer.amazon.com/edw/home.html#/
   2.  An AWS Lambda account - https://aws.amazon.com/lambda/ (Click on getting started)
-  3.  A WISPr account - http://www2.wispr.rocks/signup
+  3.  A WISPr account - http://www.wispr.rocks/signup
 
 ###After you have created your accounts, clone, build, and zip the lambda function: 
   1.  clone this repo
