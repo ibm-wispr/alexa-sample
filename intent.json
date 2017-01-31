@@ -1,0 +1,14 @@
+{
+  "intents": [
+    {
+      "intent": "GetEmailCount",
+      "slots": [
+      ]
+    },
+    {
+      "intent": "MostAnnoyingPerson",
+      "slots": [
+      ]
+    }
+  ]
+}
