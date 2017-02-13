@@ -7,7 +7,7 @@
 
 /**
  * To hide the url, username, and password to the WISPr server, we use environment variables.
- * To sign up for your username/password and get access to the API's, please sign up at http://www.wispr.rocks/signup
+ * To sign up for your username/password and get access to the API's, please sign up at http://www2.wispr.rocks/signup
  */
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
@@ -123,18 +123,18 @@ function handleAnswerRequest(intent, session, callback) {
         speechOutput = "Sorry, I cannot connect to Wispr.";
       }else{
         //get the JWT token to be used for subsequent requests.
-        var jwt = body.data[0].jwt;
+        var jwt = body.data[0].token;
         //get all the emails in the inbox
-        request.get({url:SERVER_URL + 'api/messages/search?start=0&tag=INBOX', headers: {"Authorization": jwt},json:true}, function optionalCallback(err, httpResponse, body) {
+        request.get({url:SERVER_URL + 'api/tags/Inbox?start=1&count=20', headers: {"Authorization": jwt},json:true}, function optionalCallback(err, httpResponse, body) {
           //check the intent from alexa.  You can find the intents defined in intent.json.  Intent.json is not used, but is copied into the Alexa Skill
           //more details on intents can be found here - https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interaction-model-reference
         if (intent.name == 'GetEmailCount'){
           //if the intent is just asking for the number of emails the person has received, send back the email count.
-          speechOutput = 'You have ' + body.data.length + ' emails in your inbox';
+          speechOutput = 'You have ' + body.data[0].documents.length + ' emails in your inbox';
         }else{
           //if the intent is asking for who sent the most new emails to the person, count them up and send back the most annoying person
           var names = new Object();
-          body.data.forEach(function(email){
+          body.data[0].documents.forEach(function(email){
             //console.log(email.from);
             if (names[email.from]){
               names[email.from] += 1;
