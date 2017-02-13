@@ -7,7 +7,7 @@
 
 /**
  * To hide the url, username, and password to the WISPr server, we use environment variables.
- * To sign up for your username/password and get access to the API's, please sign up at http://www2.wispr.rocks/signup
+ * To sign up for your username/password and get access to the API's, please sign up at http://www.wispr.rocks/signup
  */
 // Route the incoming request based on type (LaunchRequest, IntentRequest,
 // etc.) The JSON body of the request is provided in the event parameter.
