@@ -1,6 +1,8 @@
 /**
- * This sample is adapted from the AWS Simple Trivia skill sample.  It handles 2 intents with no slots.
- *
+ * This sample is adapted from the AWS Simple Trivia skill sample.  It handles 3 intents with no slots.
+ * Updated 17-02-2017 By Stuart McKay
+ * Added Additional Intent to read my most recent email from my inbox.
+ * 
  */
 
 'use strict';
@@ -104,7 +106,7 @@ var CARD_TITLE = "WISPr"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = "Hello",
+        speechOutput = "Hello this is Alexa on Whisper mail. A Cloud based platform for service providers and enterprises",
         shouldEndSession = true;
 
     sessionAttributes = {
@@ -131,6 +133,18 @@ function handleAnswerRequest(intent, session, callback) {
         if (intent.name == 'GetEmailCount'){
           //if the intent is just asking for the number of emails the person has received, send back the email count.
           speechOutput = 'You have ' + body.data[0].documents.length + ' emails in your inbox';
+       } else if (intent.name == 'ReadEmail'){
+      //if the intent is grab the most recent email in your inbox and read back the metadata
+      var d = new Date(body.data[0].documents[0].postedDate);
+          //if the intent is just asking for the most recent email in your inbox.
+       if  (body.data[0].documents[0].importance) {
+          // speechOutput = 'Your most recent email  <break time="2ms"/> is URGENT, sent '+ timeSince(d) +' <break time="5ms"/> is from ' + body.data[0].documents[0].from + '  <break time="6ms"/> with the subject '+  body.data[0].documents[0].subject ;
+             speechOutput = 'Your most recent email is URGENT, sent '+ timeSince(d) +', and is from ' + body.data[0].documents[0].from + ' with the subject '+  body.data[0].documents[0].subject ;
+      } else {
+          
+          speechOutput = 'Your most recent email is sent '+ timeSince(d) +' and is is from ' + body.data[0].documents[0].from + ' with the subject '+  body.data[0].documents[0].subject + ' it is NOT urgent' ;
+       }
+      
         }else{
           //if the intent is asking for who sent the most new emails to the person, count them up and send back the most annoying person
           var names = new Object();
@@ -150,7 +164,7 @@ function handleAnswerRequest(intent, session, callback) {
               annoyingCount = names[name];
             }
           }
-          speechOutput = 'The most annoying person is ' + annoyingPerson + ' with ' + annoyingCount + ' emails';
+          speechOutput = 'By most annoying person, you mean who sends you the most emails. The most annoying person is ' + annoyingPerson + ' with ' + annoyingCount + ' emails';
         }
 
           //build the response and send it back to Alexa!
@@ -216,6 +230,27 @@ function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
         shouldEndSession: shouldEndSession
     };
 }
+
+ function timeSince(timeStamp) {
+    var now = new Date(),
+      secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;
+    if(secondsPast < 60){
+      return parseInt(secondsPast) + 'seconds ago';
+    }
+    if(secondsPast < 3600){
+      return parseInt(secondsPast/60) + 'minutes ago';
+    }
+    if(secondsPast <= 86400){
+      return parseInt(secondsPast/3600) + 'hours ago';
+    }
+    if(secondsPast > 86400){
+        day = timeStamp.getDate();
+        month = timeStamp.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ","");
+        year = timeStamp.getFullYear() == now.getFullYear() ? "" :  " "+timeStamp.getFullYear();
+        return day + " " + month + year;
+    }
+  }
+
 
 function buildSpeechletResponseWithoutCard(output, repromptText, shouldEndSession) {
     return {
