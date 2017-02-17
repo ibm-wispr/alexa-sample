@@ -106,7 +106,7 @@ var CARD_TITLE = "WISPr"; // Be sure to change this for your skill.
 
 function getWelcomeResponse(callback) {
     var sessionAttributes = {},
-        speechOutput = "Hello this is Alexa on Whisper mail. A Cloud based platform for service providers and enterprises",
+        speechOutput = "Hello Stuart,,,,,,this is Alexa on Whisper mail. A Cloud based platform for service providers and enterprises",
         shouldEndSession = true;
 
     sessionAttributes = {
@@ -127,7 +127,7 @@ function handleAnswerRequest(intent, session, callback) {
         //get the JWT token to be used for subsequent requests.
         var jwt = body.data[0].token;
         //get all the emails in the inbox
-        request.get({url:SERVER_URL + 'api/tags/Inbox?start=1&count=20', headers: {"Authorization": jwt},json:true}, function optionalCallback(err, httpResponse, body) {
+        request.get({url:SERVER_URL + 'api/tags/Inbox?start=1&count=50', headers: {"Authorization": jwt},json:true}, function optionalCallback(err, httpResponse, body) {
           //check the intent from alexa.  You can find the intents defined in intent.json.  Intent.json is not used, but is copied into the Alexa Skill
           //more details on intents can be found here - https://developer.amazon.com/public/solutions/alexa/alexa-skills-kit/docs/alexa-skills-kit-interaction-model-reference
         if (intent.name == 'GetEmailCount'){
@@ -138,11 +138,14 @@ function handleAnswerRequest(intent, session, callback) {
       var d = new Date(body.data[0].documents[0].postedDate);
           //if the intent is just asking for the most recent email in your inbox.
        if  (body.data[0].documents[0].importance) {
-          // speechOutput = 'Your most recent email  <break time="2ms"/> is URGENT, sent '+ timeSince(d) +' <break time="5ms"/> is from ' + body.data[0].documents[0].from + '  <break time="6ms"/> with the subject '+  body.data[0].documents[0].subject ;
-             speechOutput = 'Your most recent email is URGENT, sent '+ timeSince(d) +', and is from ' + body.data[0].documents[0].from + ' with the subject '+  body.data[0].documents[0].subject ;
+          //If the email is urgent, we use this.
+          // we use a function calculateSince to read back how old the email is based on the timestamp
+             speechOutput = 'Your most recent email is URGENT,,,,,,,,,,,,,, sent '+ calculateSince(d) +',,,,,,,,,,,,,, and is from ' + body.data[0].documents[0].from + ',,,,,,,,,,,,,, with the subject '+  body.data[0].documents[0].subject ;
       } else {
-          
-          speechOutput = 'Your most recent email is sent '+ timeSince(d) +' and is is from ' + body.data[0].documents[0].from + ' with the subject '+  body.data[0].documents[0].subject + ' it is NOT urgent' ;
+            //If the email is not usergent, we use this output
+          // we use a function calculateSince to read back how old the email is based on the timestamp
+          speechOutput = 'Your most recent email is sent '+ calculateSince(d) +' ,,,,,,, and is is from ' + body.data[0].documents[0].from + ' ,,,,,,,, with the subject '+  body.data[0].documents[0].subject + ',,,,,,,,,,,, it is NOT urgent' ;
+     
        }
       
         }else{
@@ -231,25 +234,55 @@ function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
     };
 }
 
- function timeSince(timeStamp) {
-    var now = new Date(),
-      secondsPast = (now.getTime() - timeStamp.getTime()) / 1000;
-    if(secondsPast < 60){
-      return parseInt(secondsPast) + 'seconds ago';
+
+//converts a js Date object ot a relative "time since" statement
+function calculateSince(datetime)
+{
+    var tTime=new Date(datetime);
+    var cTime=new Date();
+    var sinceMin=Math.round((cTime-tTime)/60000);
+    if(sinceMin==0)
+    {
+        var sinceSec=Math.round((cTime-tTime)/1000);
+        if(sinceSec<10)
+          var since='less than 10 seconds ago';
+        else if(sinceSec<20)
+          var since='less than 20 seconds ago';
+        else
+          var since='half a minute ago';
     }
-    if(secondsPast < 3600){
-      return parseInt(secondsPast/60) + 'minutes ago';
+    else if(sinceMin==1)
+    {
+        var sinceSec=Math.round((cTime-tTime)/1000);
+        if(sinceSec==30)
+          var since='half a minute ago';
+        else if(sinceSec<60)
+          var since='less than a minute ago';
+        else
+          var since='1 minute ago';
     }
-    if(secondsPast <= 86400){
-      return parseInt(secondsPast/3600) + 'hours ago';
+    else if(sinceMin<45)
+        var since=sinceMin+' minutes ago';
+    else if(sinceMin>44&&sinceMin<60)
+        var since='about 1 hour ago';
+    else if(sinceMin<1440){
+        var sinceHr=Math.round(sinceMin/60);
+    if(sinceHr==1)
+      var since='about 1 hour ago';
+    else
+      var since='about '+sinceHr+' hours ago';
     }
-    if(secondsPast > 86400){
-        day = timeStamp.getDate();
-        month = timeStamp.toDateString().match(/ [a-zA-Z]*/)[0].replace(" ","");
-        year = timeStamp.getFullYear() == now.getFullYear() ? "" :  " "+timeStamp.getFullYear();
-        return day + " " + month + year;
+    else if(sinceMin>1439&&sinceMin<2880)
+        var since='1 day ago';
+    else
+    {
+        var sinceDay=Math.round(sinceMin/1440);
+        var since=sinceDay+' days ago';
     }
-  }
+    return since;
+};
+
+
 
 
 function buildSpeechletResponseWithoutCard(output, repromptText, shouldEndSession) {
