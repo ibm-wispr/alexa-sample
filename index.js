@@ -137,7 +137,7 @@ function handleAnswerRequest(intent, session, callback) {
       //if the intent is grab the most recent email in your inbox and read back the metadata
       var d = new Date(body.data[0].documents[0].postedDate);
           //if the intent is just asking for the most recent email in your inbox.
-       if  (body.data[0].documents[0].importance = true ) {
+       if  (body.data[0].documents[0].importance) {
           // speechOutput = 'Your most recent email  <break time="2ms"/> is URGENT, sent '+ timeSince(d) +' <break time="5ms"/> is from ' + body.data[0].documents[0].from + '  <break time="6ms"/> with the subject '+  body.data[0].documents[0].subject ;
              speechOutput = 'Your most recent email is URGENT, sent '+ timeSince(d) +', and is from ' + body.data[0].documents[0].from + ' with the subject '+  body.data[0].documents[0].subject ;
       } else {
